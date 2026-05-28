@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#C9A84C;--gold-l:#E8C97A;
+  --dark:#0A0E1A;--dark2:#111827;--dark3:#1E2A3A;--dark4:#243044;
+  --text:#F0F4FF;--muted:#8A9BB5;
+  --green:#22C55E;--cell-border:rgba(255,255,255,0.07);
+}
+body{font-family:'Outfit',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+
+/* ── LOGIN ── */
+#ls{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse at 50% 0%,#1a2540,var(--dark) 70%);}
+#ls::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L55 20L55 40L30 55L5 40L5 20Z' fill='none' stroke='rgba(201,168,76,0.04)' stroke-width='1'/%3E%3C/svg%3E") repeat;pointer-events:none;}
+.l-badge{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--gold);opacity:.8;margin-bottom:1rem;}
+.l-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);background:linear-gradient(135deg,var(--gold-l),var(--gold),#8A6A20);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;text-align:center;margin-bottom:.25rem;}
+.l-sub{font-size:1rem;color:var(--muted);margin-bottom:3rem;letter-spacing:1px;}
+.l-lbl{font-size:.75rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;font-weight:600;}
+.ugrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;max-width:500px;}
+.ubtn{background:var(--dark3);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:1.25rem .75rem;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:.5rem;color:var(--text);font-family:'Outfit',sans-serif;}
+.ubtn:hover{background:var(--dark4);border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(201,168,76,.15);}
+.uav{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;font-weight:700;}
+.uname{font-size:.9rem;font-weight:600;}
+
+/* ── APP ── */
+#as{display:none;}
+.topbar{background:var(--dark2);border-bottom:1px solid rgba(201,168,76,.15);padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tlogo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;}
+.lout{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:.35rem .9rem;border-radius:8px;cursor:pointer;font-size:.8rem;font-family:'Outfit',sans-serif;transition:all .2s;}
+.lout:hover{background:rgba(201,168,76,.2);}
+
+/* ── STATS ── */
+.sbar{background:var(--dark3);border-bottom:1px solid rgba(255,255,255,.05);padding:.6rem 1.25rem;display:flex;gap:1.5rem;font-size:.78rem;color:var(--muted);flex-wrap:wrap;}
+.sbar strong{color:var(--gold);font-weight:700;}
+
+/* ── FILTERS ── */
+.ftrow{padding:.75rem 1rem .25rem;display:flex;gap:.4rem;flex-wrap:wrap;}
+.gf{background:var(--dark3);border:1px solid rgba(255,255,255,.08);color:var(--muted);padding:.3rem .65rem;border-radius:20px;cursor:pointer;font-size:.72rem;font-family:'Outfit',sans-serif;transition:all .2s;letter-spacing:.5px;}
+.gf:hover,.gf.active{background:var(--gold);border-color:var(--gold);color:var(--dark);font-weight:700;}
+
+/* ── MONTH BLOCK ── */
+.month-block{padding:.75rem 1rem 1.5rem;}
+.month-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.75rem;letter-spacing:2px;}
+
+/* ── CALENDAR GRID ── */
+.cal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.cal-grid{min-width:700px;border:1px solid var(--cell-border);border-radius:12px;overflow:hidden;}
+
+/* Header row */
+.cal-head{display:grid;grid-template-columns:44px repeat(7,1fr);background:var(--dark3);border-bottom:1px solid var(--cell-border);}
+.ch-sem{display:flex;align-items:center;justify-content:center;font-size:.6rem;letter-spacing:1.5px;color:var(--muted);border-right:1px solid var(--cell-border);padding:.5rem 0;}
+.ch-day{text-align:center;font-size:.72rem;font-weight:600;letter-spacing:1px;color:var(--muted);padding:.55rem 0;border-right:1px solid var(--cell-border);}
+.ch-day:last-child{border-right:none;}
+
+/* Calendar row (week) */
+.cal-row{display:grid;grid-template-columns:44px repeat(7,1fr);border-bottom:1px solid var(--cell-border);}
+.cal-row:last-child{border-bottom:none;}
+.week-num{display:flex;align-items:flex-start;justify-content:center;padding:.5rem 0;font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:var(--muted);border-right:1px solid var(--cell-border);}
+
+/* Cell */
+.cell{border-right:1px solid var(--cell-border);padding:.4rem .35rem;min-height:110px;vertical-align:top;background:var(--dark2);transition:background .15s;position:relative;}
+.cell:last-child{border-right:none;}
+.cell.other-month{background:#0d1220;opacity:.5;}
+.cell-num{font-size:.72rem;font-weight:700;color:var(--muted);text-align:right;margin-bottom:.3rem;padding-right:2px;}
+.cell.today .cell-num{color:var(--gold);}
+
+/* Match pill inside cell */
+.mpill{background:var(--dark4);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.3rem .35rem;margin-bottom:.3rem;cursor:default;transition:border-color .2s;}
+.mpill:hover{border-color:rgba(201,168,76,.3);}
+.mpill.going{border-color:var(--green);background:rgba(34,197,94,.07);}
+
+.pill-top{display:flex;align-items:center;justify-content:space-between;gap:2px;margin-bottom:.25rem;}
+.pill-time{font-family:'Bebas Neue',sans-serif;font-size:.75rem;color:var(--gold-l);letter-spacing:.5px;}
+.pill-grp{font-size:.55rem;color:var(--muted);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:8px;font-weight:600;}
+
+.pill-match{display:flex;align-items:center;gap:3px;font-size:.65rem;margin-bottom:.3rem;}
+.pill-flag{font-size:.85rem;line-height:1;}
+.pill-vs{color:var(--muted);font-size:.55rem;flex-shrink:0;}
+.pill-tname{color:var(--text);font-weight:500;font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px;}
+
+.abtn{display:flex;align-items:center;justify-content:center;gap:3px;width:100%;padding:.22rem .2rem;border-radius:6px;border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.08);color:#22C55E;font-size:.58rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;letter-spacing:.3px;}
+.abtn:hover{background:rgba(34,197,94,.18);border-color:var(--green);}
+.abtn.going{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 8px rgba(34,197,94,.3);}
+.abtn.going:hover{background:#16A34A;border-color:#16A34A;}
+
+/* attendees chips */
+.att-chips{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;}
+.att-chip{font-size:.5rem;padding:1px 4px;border-radius:6px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="l-badge">⚽ FIFA World Cup</div>
+  <div class="l-title">MUNDIAL 2026</div>
+  <div class="l-sub">USA · México · Canadá</div>
+  <div class="l-lbl">¿Quién eres?</div>
+  <div class="ugrid" id="ugrid"></div>
+</div>
+
+<!-- APP -->
+<div id="as">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:.6rem;">
+      <div class="tlogo">⚽ MUNDIAL 2026</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <div class="tav" id="tav"></div>
+        <span style="font-weight:600;font-size:.9rem;" id="tusr"></span>
+      </div>
+      <button class="lout" onclick="logout()">← Salir</button>
+    </div>
+  </div>
+
+  <div class="sbar">
+    <span>Partidos: <strong>72</strong></span>
+    <span>Asistiré: <strong id="sg">0</strong></span>
+    <span>Grupos: <strong>A – L</strong></span>
+    <span>Fase de grupos: <strong>11 jun – 27 jun</strong></span>
+  </div>
+
+  <div class="ftrow" id="ftrow"></div>
+  <div id="cal-main"></div>
+</div>
+
+<script>
+const USERS=[
+  {name:'Alonso', color:'#3B82F6'},
+  {name:'Rodrigo',color:'#A855F7'},
+  {name:'Angelo', color:'#F97316'},
+  {name:'Daniela',color:'#EC4899'},
+  {name:'Erick',  color:'#14B8A6'},
+  {name:'Kim',    color:'#EAB308'},
+];
+
+const FLAGS={
+  'México':'🇲🇽','Sudáfrica':'🇿🇦','Corea del Sur':'🇰🇷','Chequia':'🇨🇿',
+  'Canadá':'🇨🇦','Bosnia y Herzegovina':'🇧🇦','Estados Unidos':'🇺🇸','Paraguay':'🇵🇾',
+  'Catar':'🇶🇦','Suiza':'🇨🇭','Brasil':'🇧🇷','Marruecos':'🇲🇦','Haití':'🇭🇹','Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Australia':'🇦🇺','Turquía':'🇹🇷','Alemania':'🇩🇪','Curazao':'🇨🇼',
+  'Países Bajos':'🇳🇱','Japón':'🇯🇵','Costa de Marfil':'🇨🇮','Ecuador':'🇪🇨',
+  'Suecia':'🇸🇪','Túnez':'🇹🇳','España':'🇪🇸','Cabo Verde':'🇨🇻',
+  'Bélgica':'🇧🇪','Egipto':'🇪🇬','Arabia Saudita':'🇸🇦','Uruguay':'🇺🇾',
+  'Irán':'🇮🇷','Nueva Zelanda':'🇳🇿','Francia':'🇫🇷','Senegal':'🇸🇳',
+  'Irak':'🇮🇶','Noruega':'🇳🇴','Argentina':'🇦🇷','Argelia':'🇩🇿',
+  'Austria':'🇦🇹','Jordania':'🇯🇴','Portugal':'🇵🇹','RD Congo':'🇨🇩',
+  'Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
+  'Uzbekistán':'🇺🇿','Colombia':'🇨🇴',
+};
+
+const MATCHES=[
+  {id:1, d:[2026,6,11],h:'13:00',home:'México',away:'Sudáfrica',g:'A'},
+  {id:2, d:[2026,6,11],h:'20:00',home:'Corea del Sur',away:'Chequia',g:'A'},
+  {id:3, d:[2026,6,12],h:'15:00',home:'Canadá',away:'Bosnia y Herzegovina',g:'B'},
+  {id:4, d:[2026,6,12],h:'18:00',home:'Estados Unidos',away:'Paraguay',g:'D'},
+  {id:5, d:[2026,6,13],h:'12:00',home:'Catar',away:'Suiza',g:'B'},
+  {id:6, d:[2026,6,13],h:'18:00',home:'Brasil',away:'Marruecos',g:'C'},
+  {id:7, d:[2026,6,13],h:'21:00',home:'Haití',away:'Escocia',g:'C'},
+  {id:8, d:[2026,6,13],h:'21:00',home:'Australia',away:'Turquía',g:'D'},
+  {id:9, d:[2026,6,14],h:'12:00',home:'Alemania',away:'Curazao',g:'E'},
+  {id:10,d:[2026,6,14],h:'15:00',home:'Países Bajos',away:'Japón',g:'F'},
+  {id:11,d:[2026,6,14],h:'19:00',home:'Costa de Marfil',away:'Ecuador',g:'E'},
+  {id:12,d:[2026,6,14],h:'20:00',home:'Suecia',away:'Túnez',g:'F'},
+  {id:13,d:[2026,6,15],h:'12:00',home:'España',away:'Cabo Verde',g:'H'},
+  {id:14,d:[2026,6,15],h:'12:00',home:'Bélgica',away:'Egipto',g:'G'},
+  {id:15,d:[2026,6,15],h:'18:00',home:'Arabia Saudita',away:'Uruguay',g:'H'},
+  {id:16,d:[2026,6,15],h:'18:00',home:'Irán',away:'Nueva Zelanda',g:'G'},
+  {id:17,d:[2026,6,16],h:'15:00',home:'Francia',away:'Senegal',g:'I'},
+  {id:18,d:[2026,6,16],h:'18:00',home:'Irak',away:'Noruega',g:'I'},
+  {id:19,d:[2026,6,16],h:'20:00',home:'Argentina',away:'Argelia',g:'J'},
+  {id:20,d:[2026,6,16],h:'21:00',home:'Austria',away:'Jordania',g:'J'},
+  {id:21,d:[2026,6,17],h:'12:00',home:'Portugal',away:'RD Congo',g:'K'},
+  {id:22,d:[2026,6,17],h:'15:00',home:'Inglaterra',away:'Croacia',g:'L'},
+  {id:23,d:[2026,6,17],h:'19:00',home:'Ghana',away:'Panamá',g:'L'},
+  {id:24,d:[2026,6,17],h:'20:00',home:'Uzbekistán',away:'Colombia',g:'K'},
+  {id:25,d:[2026,6,18],h:'12:00',home:'Chequia',away:'Sudáfrica',g:'A'},
+  {id:26,d:[2026,6,18],h:'12:00',home:'Suiza',away:'Bosnia y Herzegovina',g:'B'},
+  {id:27,d:[2026,6,18],h:'15:00',home:'Canadá',away:'Catar',g:'B'},
+  {id:28,d:[2026,6,18],h:'19:00',home:'México',away:'Corea del Sur',g:'A'},
+  {id:29,d:[2026,6,19],h:'12:00',home:'Estados Unidos',away:'Australia',g:'D'},
+  {id:30,d:[2026,6,19],h:'18:00',home:'Escocia',away:'Marruecos',g:'C'},
+  {id:31,d:[2026,6,19],h:'21:00',home:'Brasil',away:'Haití',g:'C'},
+  {id:32,d:[2026,6,19],h:'21:00',home:'Turquía',away:'Paraguay',g:'D'},
+  {id:33,d:[2026,6,20],h:'12:00',home:'Países Bajos',away:'Suecia',g:'F'},
+  {id:34,d:[2026,6,20],h:'16:00',home:'Alemania',away:'Costa de Marfil',g:'E'},
+  {id:35,d:[2026,6,20],h:'19:00',home:'Ecuador',away:'Curazao',g:'E'},
+  {id:36,d:[2026,6,20],h:'22:00',home:'Túnez',away:'Japón',g:'F'},
+  {id:37,d:[2026,6,21],h:'12:00',home:'España',away:'Arabia Saudita',g:'H'},
+  {id:38,d:[2026,6,21],h:'12:00',home:'Bélgica',away:'Irán',g:'G'},
+  {id:39,d:[2026,6,21],h:'18:00',home:'Uruguay',away:'Cabo Verde',g:'H'},
+  {id:40,d:[2026,6,21],h:'18:00',home:'Nueva Zelanda',away:'Egipto',g:'G'},
+  {id:41,d:[2026,6,22],h:'12:00',home:'Argentina',away:'Austria',g:'J'},
+  {id:42,d:[2026,6,22],h:'17:00',home:'Francia',away:'Irak',g:'I'},
+  {id:43,d:[2026,6,22],h:'20:00',home:'Noruega',away:'Senegal',g:'I'},
+  {id:44,d:[2026,6,22],h:'20:00',home:'Jordania',away:'Argelia',g:'J'},
+  {id:45,d:[2026,6,23],h:'12:00',home:'Portugal',away:'Uzbekistán',g:'K'},
+  {id:46,d:[2026,6,23],h:'16:00',home:'Inglaterra',away:'Ghana',g:'L'},
+  {id:47,d:[2026,6,23],h:'19:00',home:'Panamá',away:'Croacia',g:'L'},
+  {id:48,d:[2026,6,23],h:'20:00',home:'Colombia',away:'RD Congo',g:'K'},
+  {id:49,d:[2026,6,24],h:'12:00',home:'Suiza',away:'Canadá',g:'B'},
+  {id:50,d:[2026,6,24],h:'12:00',home:'Bosnia y Herzegovina',away:'Catar',g:'B'},
+  {id:51,d:[2026,6,24],h:'18:00',home:'Escocia',away:'Brasil',g:'C'},
+  {id:52,d:[2026,6,24],h:'18:00',home:'Marruecos',away:'Haití',g:'C'},
+  {id:53,d:[2026,6,24],h:'19:00',home:'Chequia',away:'México',g:'A'},
+  {id:54,d:[2026,6,24],h:'19:00',home:'Sudáfrica',away:'Corea del Sur',g:'A'},
+  {id:55,d:[2026,6,25],h:'16:00',home:'Curazao',away:'Costa de Marfil',g:'E'},
+  {id:56,d:[2026,6,25],h:'16:00',home:'Ecuador',away:'Alemania',g:'E'},
+  {id:57,d:[2026,6,25],h:'18:00',home:'Japón',away:'Suecia',g:'F'},
+  {id:58,d:[2026,6,25],h:'18:00',home:'Túnez',away:'Países Bajos',g:'F'},
+  {id:59,d:[2026,6,25],h:'19:00',home:'Turquía',away:'Estados Unidos',g:'D'},
+  {id:60,d:[2026,6,25],h:'19:00',home:'Paraguay',away:'Australia',g:'D'},
+  {id:61,d:[2026,6,26],h:'15:00',home:'Noruega',away:'Francia',g:'I'},
+  {id:62,d:[2026,6,26],h:'15:00',home:'Senegal',away:'Irak',g:'I'},
+  {id:63,d:[2026,6,26],h:'18:00',home:'Uruguay',away:'España',g:'H'},
+  {id:64,d:[2026,6,26],h:'19:00',home:'Cabo Verde',away:'Arabia Saudita',g:'H'},
+  {id:65,d:[2026,6,26],h:'20:00',home:'Egipto',away:'Irán',g:'G'},
+  {id:66,d:[2026,6,26],h:'20:00',home:'Nueva Zelanda',away:'Bélgica',g:'G'},
+  {id:67,d:[2026,6,27],h:'17:00',home:'Panamá',away:'Inglaterra',g:'L'},
+  {id:68,d:[2026,6,27],h:'17:00',home:'Croacia',away:'Ghana',g:'L'},
+  {id:69,d:[2026,6,27],h:'19:30',home:'Colombia',away:'Portugal',g:'K'},
+  {id:70,d:[2026,6,27],h:'19:30',home:'RD Congo',away:'Uzbekistán',g:'K'},
+  {id:71,d:[2026,6,27],h:'21:00',home:'Argelia',away:'Austria',g:'J'},
+  {id:72,d:[2026,6,27],h:'21:00',home:'Jordania',away:'Argentina',g:'J'},
+];
+
+const MONTHS=[
+  {y:2026,m:6,label:'Junio 2026'},
+  {y:2026,m:7,label:'Julio 2026'},
+];
+
+let currentUser=null, activeGroup='ALL', attendance={};
+
+function sk(u){return 'm26_v2_'+u;}
+function loadAtt(u){try{const r=localStorage.getItem(sk(u));return r?new Set(JSON.parse(r)):new Set();}catch(e){return new Set();}}
+function saveAtt(u,s){try{localStorage.setItem(sk(u),JSON.stringify([...s]));}catch(e){}}
+
+function initUsers(){
+  const g=document.getElementById('ugrid');
+  USERS.forEach(u=>{
+    const b=document.createElement('button');
+    b.className='ubtn';
+    b.innerHTML=`<div class="uav" style="background:${u.color};color:#fff">${u.name[0]}</div><span class="uname">${u.name}</span>`;
+    b.onclick=()=>login(u.name);
+    g.appendChild(b);
+  });
+}
+
+function login(name){
+  currentUser=name;
+  const u=USERS.find(x=>x.name===name);
+  USERS.forEach(usr=>{attendance[usr.name]=loadAtt(usr.name);});
+  document.getElementById('tav').style.background=u.color;
+  document.getElementById('tav').style.color='#fff';
+  document.getElementById('tav').textContent=name[0];
+  document.getElementById('tusr').textContent=name;
+  document.getElementById('ls').style.display='none';
+  document.getElementById('as').style.display='block';
+  buildFilters();
+  renderAll();
+}
+
+function logout(){
+  currentUser=null; activeGroup='ALL';
+  document.getElementById('ls').style.display='flex';
+  document.getElementById('as').style.display='none';
+}
+
+function buildFilters(){
+  const groups=['ALL','A','B','C','D','E','F','G','H','I','J','K','L'];
+  const wrap=document.getElementById('ftrow');
+  wrap.innerHTML='';
+  groups.forEach(g=>{
+    const b=document.createElement('button');
+    b.className='gf'+(g===activeGroup?' active':'');
+    b.textContent=g==='ALL'?'Todos':'Grupo '+g;
+    b.onclick=()=>{activeGroup=g;buildFilters();renderAll();};
+    wrap.appendChild(b);
+  });
+}
+
+function toggleAttend(mid){
+  const s=attendance[currentUser];
+  if(s.has(mid))s.delete(mid); else s.add(mid);
+  saveAtt(currentUser,s);
+  renderAll();
+}
+
+function getMatchesForDay(y,m,d){
+  return MATCHES.filter(mx=>{
+    const [my,mm,md]=mx.d;
+    return my===y&&mm===m&&md===d;
+  }).filter(mx=>activeGroup==='ALL'||mx.g===activeGroup)
+    .sort((a,b)=>a.h.localeCompare(b.h));
+}
+
+function renderAll(){
+  const main=document.getElementById('cal-main');
+  main.innerHTML='';
+
+  MONTHS.forEach(({y,m,label})=>{
+    // Check if this month has any matches (when filtering)
+    const monthHasMatches = MATCHES.some(mx=>{
+      const [my,mm]=mx.d;
+      return my===y&&mm===m&&(activeGroup==='ALL'||mx.g===activeGroup);
+    });
+    // Always show June, only show July if has matches
+    if(m===7&&!monthHasMatches) return;
+
+    const block=document.createElement('div');
+    block.className='month-block';
+    block.innerHTML=`<div class="month-title">${label}</div>`;
+
+    const wrap=document.createElement('div');
+    wrap.className='cal-wrap';
+
+    const grid=document.createElement('div');
+    grid.className='cal-grid';
+
+    // Header
+    const head=document.createElement('div');
+    head.className='cal-head';
+    head.innerHTML=`<div class="ch-sem">SEM</div>`;
+    ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d=>{
+      head.innerHTML+=`<div class="ch-day">${d}</div>`;
+    });
+    grid.appendChild(head);
+
+    // Build weeks
+    const firstDay=new Date(y,m-1,1);
+    const lastDay=new Date(y,m,0).getDate();
+    // Monday=0 index
+    let startDow=firstDay.getDay(); // 0=Sun
+    startDow=(startDow+6)%7; // convert to Mon=0
+
+    const days=[];
+    for(let i=0;i<startDow;i++) days.push(null);
+    for(let d=1;d<=lastDay;d++) days.push(d);
+    while(days.length%7!==0) days.push(null);
+
+    for(let w=0;w<days.length/7;w++){
+      const week=days.slice(w*7,(w+1)*7);
+      const row=document.createElement('div');
+      row.className='cal-row';
+
+      // Week number
+      const wDate=week.find(d=>d!==null);
+      const wNum=wDate?getWeekNum(new Date(y,m-1,wDate)):'';
+      row.innerHTML=`<div class="week-num">${wNum}</div>`;
+
+      week.forEach(d=>{
+        const cell=document.createElement('div');
+        cell.className='cell'+(d===null?' other-month':'');
+        if(d===null){cell.innerHTML='';row.appendChild(cell);return;}
+        cell.innerHTML=`<div class="cell-num">${String(d).padStart(2,'0')}</div>`;
+
+        const dayMatches=getMatchesForDay(y,m,d);
+        dayMatches.forEach(mx=>{
+          const going=attendance[currentUser].has(mx.id);
+          const others=USERS.filter(u=>u.name!==currentUser&&attendance[u.name]?.has(mx.id));
+
+          const pill=document.createElement('div');
+          pill.className='mpill'+(going?' going':'');
+
+          const chipsHtml=others.length
+            ?`<div class="att-chips">${others.map(u=>`<span class="att-chip" style="background:${u.color}22;color:${u.color}">${u.name[0]}</span>`).join('')}</div>`
+            :'';
+
+          pill.innerHTML=`
+            <div class="pill-top">
+              <span class="pill-time">${mx.h}</span>
+              <span class="pill-grp">G·${mx.g}</span>
+            </div>
+            <div class="pill-match">
+              <span class="pill-flag">${FLAGS[mx.home]||'🏳️'}</span>
+              <span class="pill-tname">${mx.home}</span>
+              <span class="pill-vs">vs</span>
+              <span class="pill-flag">${FLAGS[mx.away]||'🏳️'}</span>
+              <span class="pill-tname">${mx.away}</span>
+            </div>
+            ${chipsHtml}
+            <button class="abtn${going?' going':''}" onclick="toggleAttend(${mx.id})">
+              ${going?'✓ Asistiré':'+ Asistiré'}
+            </button>
+          `;
+          cell.appendChild(pill);
+        });
+
+        row.appendChild(cell);
+      });
+
+      grid.appendChild(row);
+    }
+
+    wrap.appendChild(grid);
+    block.appendChild(wrap);
+    main.appendChild(block);
+  });
+
+  document.getElementById('sg').textContent=attendance[currentUser].size;
+}
+
+function getWeekNum(d){
+  const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
+  const yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+
+initUsers();
+</script>
+</body>
+</html>
